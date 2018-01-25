@@ -10,6 +10,7 @@
 int ci[3];					/* ci:the parametrs[xc,yc,radius] of the limbic boundary */
 int cp[3];					/* cp:the parametrs[xc, yc, radius] of the pupilary boundary */
 
+
 // Function that finds a x and y to the highest value of maxb, which is the max value of blur for each of the centre points
 // -- find(maxb == max(max(maxb))) from matlab 
 void findMaxb(Mat *matrix, int *x, int *y){
@@ -31,7 +32,7 @@ void findMaxb(Mat *matrix, int *x, int *y){
 
 
 // Function that computes the convolution operation
-vector<double> conv(vector<double> A, vector<double> B, char *option){
+vector<double> conv(vector<double> A, vector<double> B, string option){
 	int nconv = 0;
 	int i = 0, j = 0, i1 = 0;
 	double tmp;
@@ -53,7 +54,7 @@ vector<double> conv(vector<double> A, vector<double> B, char *option){
 	}
 
 	// if the option argument is the string "same", creates a new array, else, returns the C vector itself
-	if (strcmp(option, "same") == 0) {
+	if(option.compare("same") == 0){
 		int count = 0; // used as index in tmpC array creation
 		vector<double> tmpC(A.size()); // creates a temporary array with A's same size
 		for (int i = 0; i < nconv; i++) {
@@ -70,50 +71,35 @@ vector<double> conv(vector<double> A, vector<double> B, char *option){
 }
 
 
-// Function that find the pixels close to the borders and it deletes them -- lines 61 to 63 in matlab code
-void findCloseBorder(vector<int> &vecX, vector<int> &vecY, int rmin, int rmax, int rows, int cols) {
+// Function that find the pixels close to the borders-- lines 61 to 63 in matlab code
+void findCloseBorder(list<int> &vecX, list<int> &vecY, int rmin, int rmax, int rows, int cols) {
 
-	for (int i = 0; i < vecX.size(); i++){
-		// if any of the x or y values are close to the borders, it saves the index in the auxiliar vector
-		if (vecX[i] <= (rmin - 1) || vecY[i] <= (rmin - 1) || vecX[i] >((rows - rmin) - 1) ||
-			vecY[i] > ((cols - rmin) - 1)){
+	for (list<int>::iterator it = vecX.begin(), it2 = vecY.begin(); it != vecX.end() && it2 != vecY.end(); it++, it2++){
+		// if any of the x or y values are close to the borders, it saves the index in the auxiliar list
+		if (*it <= (rmin - 1) || *it2 <= (rmin - 1) || *it > ((rows - rmin) - 1) ||
+			*it2 > ((cols - rmin) - 1)){
 
 			// Deleting the pixel coordinates that are too close to the borders, setting their values to -1
-			// and then erasing them from the vector
-			vecX[i] = -1;
-			vecY[i] = -1;
-		}
-	}
-
-
-	for (int i = 0; i < vecX.size(); i++){
-		if (vecX[i] == -1){
-			while (i < vecX.size() && vecX[i] == -1)
-			{
-				vecX.erase(vecX.begin() + i);
-				vecY.erase(vecY.begin() + i);
-			}
+			// and then erasing them from the list
+			*it = -1;
+			*it2 = -1;
 		}
 	}
 }
 
 
 // Function that looks for NaN values at the vecX and vecY vectors and deletes them -- lines 57 to 59 in matlab code
-void findNan(vector<int> &vecX, vector<int> &vecY) {
+void findNan(list<int> &vecX, list<int> &vecY) {
 
-	for (int i = 0; i < vecX.size(); i++){
-		if (vecX[i] == -1){
-				// deleting the NaN values from the vectors
-				vecX.erase(vecX.begin() + i);
-				vecY.erase(vecY.begin() + i);
-		}
-	}
+	vecX.remove(-1);
+	vecY.remove(-1);
+
 }
 
 
 // Function that looks for pixel values that are lesser than 0.5 at the image and store them at the vecX and vecY vectors
 // -- find(I < 0.5) from matlab
-void find(Mat *image, vector<int> &vecX, vector<int> &vecY) {
+void find(Mat *image, list<int> &vecX, list<int> &vecY) {
 
 	Mat im_aux = *image;
 
@@ -123,7 +109,7 @@ void find(Mat *image, vector<int> &vecX, vector<int> &vecY) {
 		{
 			if (im_aux.at<double>(r, c) < 0.5)
 			{
-				// storing the values in the end of each vector
+				// storing the values in the end of each list
 				vecX.push_back(r);
 				vecY.push_back(c);
 			}
@@ -135,7 +121,7 @@ void find(Mat *image, vector<int> &vecX, vector<int> &vecY) {
 // Function that will compute the normalized line integral(for Daugman's Integro Differential Operator) around a circular contour.
 // A polygon of a large number of sides is used for aproximating a circle
 // Assuming that the image that is being passed as argument is not in double, but in uint8
-double lineint(Mat image, vector<int> C, int r, int n, char *part) {
+double lineint(Mat image, int centerX, int centerY, int r, int n, string part) {
 	double theta = (2*PI)/n; // computes the angle of the n-sides polygon
 	double L = 0.0, s = 0.0, value = 0.0; // variable initialization
 	vector<double> angle; // vector that will store all of the angles from 0 to 2*pi theta by theta
@@ -151,8 +137,8 @@ double lineint(Mat image, vector<int> C, int r, int n, char *part) {
 
 	// Storing in the x and y vectors the polar coordinates for each angle in angle vector
 	for (int i = 0; i < n; i++) {
-		x[i] = (C[0] + 1) - r*sin(angle[i]);
-		y[i] = (C[1] + 1) + r*cos(angle[i]);
+		x[i] = (centerX + 1) - r*sin(angle[i]);
+		y[i] = (centerY + 1) + r*cos(angle[i]);
 	}
 
 	// line 31 matlab condition
@@ -165,7 +151,7 @@ double lineint(Mat image, vector<int> C, int r, int n, char *part) {
 
 	//equivale a linha 37 do matlab
 	// line 37 of matlab, and consists of computing the integral for pupil
-	if (strcmp(part, "pupil") == 0) {
+	if(part.compare("pupil") == 0){
 		s = 0.0;
 		for (int i = 0; i < n; i++) {
 			value = image.at<double>(round(x[i]) - 1, round(y[i]) - 1); // takes the pixel value for each
@@ -176,7 +162,7 @@ double lineint(Mat image, vector<int> C, int r, int n, char *part) {
 	}
 
 	// line 47 of matlab, which consists on the iris integral computing
-	if (strcmp(part, "iris") == 0) {
+	if(part.compare("iris") == 0){
 		s = 0.0;
 
 		// loop from 0 to n/8
@@ -214,40 +200,40 @@ double lineint(Mat image, vector<int> C, int r, int n, char *part) {
   the following logic comparators: ==, !=, >= <=, > and <. And then, based on the comparator, it searches the value parameter
   in the vector
 */
-bool any(vector<double> toBeSearchedVector, double paramValue, char const *logicComparator) {
+bool any(vector<double> toBeSearchedVector, double paramValue, string logicComparator) {
 	double value = 0.0;
 
-	if (strcmp(logicComparator, "==") == 0) {
+	if(logicComparator.compare("==") == 0){
 		for (int i = 0; i < toBeSearchedVector.size(); i++) {
 			value = (int)(toBeSearchedVector[i] / 0.0001)*0.0001;
 			if (value == paramValue) return true;
 		}
 	}
-	else if (strcmp(logicComparator, "!=") == 0) {
+	else if(logicComparator.compare("!=") == 0){
 		for (int i = 0; i < toBeSearchedVector.size(); i++) {
 			value = (int)(toBeSearchedVector[i] / 0.0001)*0.0001;
 			if (value != paramValue) return true;
 		}
 	}
-	else if (strcmp(logicComparator, ">=") == 0) {
+	else if(logicComparator.compare(">=") == 0){
 		for (int i = 0; i < toBeSearchedVector.size(); i++) {
 			value = (int)(toBeSearchedVector[i] / 0.0001)*0.0001;
 			if (value >= paramValue) return true;
 		}
 	}
-	else if (strcmp(logicComparator, "<=") == 0) {
+	else if(logicComparator.compare("<=") == 0){
 		for (int i = 0; i < toBeSearchedVector.size(); i++) {
 			value = (int)(toBeSearchedVector[i] / 0.0001)*0.0001;
 			if (value <= paramValue) return true;
 		}
 	}
-	else if (strcmp(logicComparator, ">") == 0) {
+	else if(logicComparator.compare(">") == 0){
 		for (int i = 0; i < toBeSearchedVector.size(); i++) {
 			value = (int)(toBeSearchedVector[i] / 0.0001)*0.0001;
 			if (value > paramValue) return true;
 		}
 	}
-	else if (strcmp(logicComparator, "<") == 0) {
+	else if(logicComparator.compare("<") == 0){
 		for (int i = 0; i < toBeSearchedVector.size(); i++) {
 			value = (int)(toBeSearchedVector[i] / 0.0001)*0.0001;
 			if (value < paramValue) return true;
@@ -261,7 +247,7 @@ bool any(vector<double> toBeSearchedVector, double paramValue, char const *logic
 // Function that implements the partiald.m code from matlab and computes the partial derivative of the normalized
 // line integral(for Daugman's Integro Differential Operator), holding the centre coordinates constant
 // and then smooths it by a gaussian of appropriate sigma. Function also returns the maximum value of blur and the corresponding radius
-void partiald(double *b, int *r, vector<double> &blur, Mat *image, vector<int> &C, int rmin, int rmax, float sigma, int n, char part[7])
+void partiald(double *b, int *r, vector<double> &blur, Mat *image, int centerX, int centerY, int rmin, int rmax, float sigma, int n, string part)
 {
 	int count;					// count from the matlab code 
 	int p = 0;
@@ -278,7 +264,7 @@ void partiald(double *b, int *r, vector<double> &blur, Mat *image, vector<int> &
 
 	for (int k = 0; k < count; k++)
 	{
-		L_auxiliar = lineint(*image, C, R[k], n, part);
+		L_auxiliar = lineint(*image, centerX, centerY, R[k], n, part);
 
 		if (L_auxiliar == 0.0)
 		{
@@ -342,7 +328,7 @@ void partiald(double *b, int *r, vector<double> &blur, Mat *image, vector<int> &
 }
 // Function to detect the pupil or iris boundary it searches a certain subset of the image with a given
 // radius range(rmin,rmax) around a 10*10 neighbourhood of the point x,y given as input
-void search(Mat image, int rmin, int rmax, int x, int y, char *option){
+void search(Mat image, int rmin, int rmax, int x, int y, string option){
 	int rows = image.rows; // amount of rows in the image
 	int cols = image.cols; // amount of columns in the image
 	int radius = 0; // variable for storing the pupil or iris radius
@@ -360,14 +346,16 @@ void search(Mat image, int rmin, int rmax, int x, int y, char *option){
 	}
 
 	// loop that starts at the line 23 from the matlab function
-	vector<int> C(2); // variable that stores the values of the circle center
+	// variables that stores the values of the circle center
+	int centerX = 0;
+	int centerY = 0;
 	// the center will receive values depending on where it is in 10*10 the neighbourhood of the point x, y
 	// and it will compute partial derivative for each value in the range
 	for (int i = x - 5; i <= x + 5; i++) {
 		for (int j = y - 5; j <= y + 5; j++) {
-			C[0] = i;
-			C[1] = j;
-			partiald(&b, &r, blur, &image, C, rmin, rmax, sigma, 600, option);
+			centerX = i;
+			centerY = j;
+			partiald(&b, &r, blur, &image, centerX, centerY, rmin, rmax, sigma, 600, option);
 			maxrad.at<double>(i, j) = (double)r;
 			maxb.at<double>(i, j) = b;
 		}
@@ -380,12 +368,12 @@ void search(Mat image, int rmin, int rmax, int x, int y, char *option){
 	// ci stores values related to iris and cp to pupil
 	// if the option passed as argument is pupil, then the global variable cp will receive the values computed
 	// else if is iris, ci receives de values
-	if (strcmp(option, "pupil") == 0) {
+	if(option.compare("pupil") == 0){
 		cp[0] = X;
 		cp[1] = Y;
 		cp[2] = radius;
 	}
-	else if (strcmp(option, "iris") == 0) {
+	else if(option.compare("iris") == 0){
 		ci[0] = X;
 		ci[1] = Y;
 		ci[2] = radius;
@@ -407,40 +395,36 @@ void thresh(Mat image, double rmin, double rmax, double scale)
 
 	Mat output;							// image with the pupil center detected
 	double M = 1.0;						// minimum value 
-	int rows, cols, s, N, r = 0;
+	int rows = 0, cols = 0, r = 0;
 	double b = 0.0;
 	vector<double> blur;
-	vector<int> C;
-
+	int centerX = 0, centerY = 0; // variables for the x,y coordinates of the pupil centre
 	rmin = rmin * scale;
 	rmax = rmax * scale;
 
 	cvtColor(image, output, CV_BGR2GRAY);			// converting the image to gray scale e using output as the result of this conversion
 
-
 	// reflection removal
 	// instead of following the matlab implementation, that used the imfill() function
-	// we used the morphologic operation of erosion 
-	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(3, 3)); // kernel used for the erosion
+	// we used the morphologic operation of erose
+	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(7, 7)); // kernel used for the erosion
 	erode(output, output, element);
+	GaussianBlur(output, output, Size(5, 5), 2, 2);
 
 	output.convertTo(output, CV_64F, 1.0 / 255);		// converting the output to double
-
 	resize(output, output, Size(), scale, scale);
 
 	rows = output.rows;
 	cols = output.cols;
 
-	vector<int> vecX;		// vector that stores the x axis features of the image
-	vector<int> vecY;		// vector that stores the y axis features of the image
+	list<int> vecX;		// list that stores the x axis features of the image
+	list<int> vecY;		// list that stores the y axis features of the image
 	find(&output, vecX, vecY); // function call that stores the pixels of the image that are lesser than 0.5
 
-	s = vecX.size();
-
 	// implementation of the lines 45 to 56 from matlab code
-	for (int k = 0; k < s; k++)
-	{
-		if ((vecX[k] >(rmin - 1)) && (vecY[k] > (rmin - 1)) && (vecX[k] <= ((rows - rmin) - 1)) && (vecY[k] < ((cols - rmin) - 1)))
+	for (list<int>::iterator it = vecX.begin(), it2 = vecY.begin(); it != vecX.end() && it2 != vecY.end(); it++, it2++){
+	
+		if ((*it >(rmin - 1)) && (*it2 > (rmin - 1)) && (*it <= ((rows - rmin) - 1)) && (*it2 < ((cols - rmin) - 1)))
 		{
 			M = 1.0;
 			// computing the local minimum
@@ -448,54 +432,49 @@ void thresh(Mat image, double rmin, double rmax, double scale)
 			{
 				for (int j = -1; j <= 1; j++)
 				{
-					if (output.at<double>(vecX[k] + u, vecY[k] + j) < M)
+					if (output.at<double>(*it + u, *it2 + j) < M)
 					{
-						M = output.at<double>(vecX[k] + u, vecY[k] + j);
+						M = output.at<double>(*it + u, *it2 + j);
 					}
 				}
 			}
 
-			if (output.at<double>(vecX[k], vecY[k]) != M)	// if the pixel is not the local minimum
+			if (output.at<double>(*it, *it2) != M)	// if the pixel is not the local minimum
 			{
-				vecX[k] = -1;		// NaN
-				vecY[k] = -1;		// NaN 
+				*it = -1;		// NaN
+				*it2 = -1;		// NaN 
 			}
 		}
 	}
 
-	findNan(vecX, vecY); // erases the NaN presence from the vector
-	findCloseBorder(vecX, vecY, rmin, rmax, rows, cols); // ignore the local minimum that are close to the borders
 	
-	N = vecX.size();									// recomputing the size after the removals
-
+	findCloseBorder(vecX, vecY, rmin, rmax, rows, cols); // ignore the local minimum that are close to the borders
+	findNan(vecX, vecY); // erases the NaN presence from the forward list
+	
 	Mat maxb = Mat::zeros(rows, cols, CV_64F);			// line 68 from matlab 
 	Mat maxrad = Mat::zeros(rows, cols, CV_64F);		// line 69 from matlab 
 
 
 	// implementation of the lines 72 to 76 from matlab
-	for (int j = 0; j < N; j++) {
+	for (list<int>::iterator it = vecX.begin(), it2 = vecY.begin(); it != vecX.end() && it2 != vecY.end(); it++, it2++){
 
-		C.push_back(vecX[j]);
-		C.push_back(vecY[j]);
+		centerX = *it;
+		centerY = *it2;
 
-		partiald(&b, &r, blur, &output, C, rmin, rmax, 1.0, 600, "iris");
+		partiald(&b, &r, blur, &output, centerX, centerY, rmin, rmax, 1.0, 400, "pupil");
 
-		maxb.at<double>(vecX[j], vecY[j]) = b;
-		maxrad.at<double>(vecX[j], vecY[j]) = (double)r;
-
-		C.erase(C.begin() + 0);
-		C.erase(C.begin() + 0);
+		maxb.at<double>(*it, *it2) = b;
+		maxrad.at<double>(*it, *it2) = (double)r;
 	}
 
 	int x, y;
 	findMaxb(&maxb, &x, &y);
 
-	search(output, rmin, rmax, x, y, "iris");
+	search(output, rmin, rmax, x, y, "pupil");
 
-	/* ci = ci / scale; */
-	ci[0] = ci[0] / scale;
-	ci[1] = ci[1] / scale;
-	ci[2] = ci[2] / scale;
-
+	// adjusting the features acquired for the original scale
+	cp[0] = cp[0] / scale;
+	cp[1] = cp[1] / scale;
+	cp[2] = cp[2] / scale;
 
 }
