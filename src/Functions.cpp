@@ -368,14 +368,16 @@ void search(Mat image, int rmin, int rmax, int x, int y, string option){
 	// ci stores values related to iris and cp to pupil
 	// if the option passed as argument is pupil, then the global variable cp will receive the values computed
 	// else if is iris, ci receives de values
+
+	// Since this code was adapted from matlab, X is equal to Y and Y is equal to X
 	if(option.compare("pupil") == 0){
-		cp[0] = X;
-		cp[1] = Y;
+		cp[0] = X; // Y
+		cp[1] = Y; // X
 		cp[2] = radius;
 	}
 	else if(option.compare("iris") == 0){
-		ci[0] = X;
-		ci[1] = Y;
+		ci[0] = X; // Y
+		ci[1] = Y; // X
 		ci[2] = radius;
 	}
 	else {
