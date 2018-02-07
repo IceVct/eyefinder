@@ -24,7 +24,6 @@ extern int ci[3];					/* ci:the parametrs[xc,yc,radius] of the limbic boundary *
 extern int cp[3];					/* cp:the parametrs[xc, yc, radius] of the pupilary boundary */
 
 
-int otsuAlgorithm(Mat image, int *imgHist);
 void find(Mat *image, list<int> &vecX, list<int> &vecY);
 void findNan(list<int> &vecX, list<int> &vecY);
 void findCloseBorder(list<int> &vecX, list<int> &vecY, int rmin, int rmax, int rows, int cols);

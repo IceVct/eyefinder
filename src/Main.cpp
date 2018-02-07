@@ -56,23 +56,15 @@ int main(int argsc, char *argsv[]){
 	        if(counter == 59){
 	        	thresh(frame, rmin, rmax, 0.2);
 	        	printf("pupil (%d, %d)\n", cp[1], cp[0]);
-	        	dx = computeDistanceX(cp[1], centerCameraX);
-				dy = computeDistanceY(cp[0], centerCameraY);
-				cout << "dx = " << dx << endl;
-				cout << "dy = " << dy << endl;
+				controlPlatform(cp[1], cp[0], centerCameraX, centerCameraY);
 				drawMarker(frame, Point(cp[1], cp[0]), Scalar(0, 255, 0));
+				drawMarker(frame, Point(centerCameraX, centerCameraY), Scalar(0, 0, 255));
 				imshow("pupil", frame);
 				waitKey(0);
 	        }             
 
-	        if(counter > 59) camCenter = controlPlatform(cp[1], cp[0], centerCameraX, centerCameraY);
-
-	        if(!camCenter){
-	        	drawMarker(frame, Point(centerCameraX, centerCameraY), Scalar(0, 0, 255));
-	        }else{
-	        	drawMarker(frame, Point(centerCameraX, centerCameraY), Scalar(255, 255, 255));
-	        }
-
+	        drawMarker(frame, Point(centerCameraX, centerCameraY), Scalar(0, 0, 255));
+	        
 	        imshow("OUTPUT", frame);
 
 	        char c = (char)waitKey(70);
