@@ -1,12 +1,15 @@
 #include "Platform.hpp"
 
 // Masks for the platform commands (in bytes)
-int XAXISRIGHT = 0x12000000;
-int XAXISLEFT = 0x12400000;
-int YAXISUP = 0x22000000;
-int YAXISDOWN = 0x22400000;
+uint8_t XAXIS = 0x12;
+uint8_t YAXIS = 0x22;
+uint8_t RIGHT = 0x00; // up for Y axis
+uint8_t LEFT = 0x40; // down for Y axis
+
 
 // Functions that implements the platform related functions
+
+struct sp_port *port;
 
 // Function that receives a value in pixels and convert it to um (micrometers)
 // so that can be passed as argument to the camera platform
@@ -31,39 +34,42 @@ int computeDistanceY(int pupilY, int cameraY){
 
 // Function that moves the platform x axis left
 void moveXLeft(int distanceToMove){
-	int platformCommand = 0; // command that will be passed as argument to the camera platform
+	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
 
 	printf("Moving x axis to left by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	platformCommand = XAXISLEFT | distanceToMove;
-	printf("Command that will be passed = 0x%X\n", platformCommand);
-
+	thrdByte = (distanceToMove >> 8) & 0xFF;
+	fourthByte = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", XAXIS, LEFT, thrdByte, fourthByte);
 }
 
 // Function that moves the platform x axis right
 void moveXRight(int distanceToMove){
-	int platformCommand = 0; // command that will be passed as argument to the camera platform 
+	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
 
 	printf("Moving x axis to right by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	platformCommand = XAXISRIGHT | distanceToMove;
-	printf("Command that will be passed = 0x%X\n", platformCommand);
+	thrdByte = (distanceToMove >> 8) & 0xFF;
+	fourthByte = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", XAXIS, RIGHT, thrdByte, fourthByte);
 }
 
 // Function that moves the platform y axis up
 void moveYUp(int distanceToMove){
-	int platformCommand = 0; // command that will be passed as argument to the camera platform 
+	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
 	
 	printf("Moving y axis up by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	platformCommand = YAXISUP | distanceToMove;
-	printf("Command that will be passed = 0x%X\n", platformCommand);
+	thrdByte = (distanceToMove >> 8) & 0xFF;
+	fourthByte = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", YAXIS, RIGHT, thrdByte, fourthByte);
 }
 
 // Function that moves the platform y axis down
 void moveYDown(int distanceToMove){
-	int platformCommand = 0; // command that will be passed as argument to the camera platform 
+	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
 	
 	printf("Moving y axis down by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	platformCommand = YAXISDOWN | distanceToMove;
-	printf("Command that will be passed = 0x%X\n", platformCommand);
+	thrdByte = (distanceToMove >> 8) & 0xFF;
+	fourthByte = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", YAXIS, LEFT, thrdByte, fourthByte);
 }
 
 /* Function for implementing the platform moving logic

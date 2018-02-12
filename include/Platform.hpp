@@ -11,6 +11,8 @@
 #include <float.h>
 #include <math.h> 
 #include <ctime>
+#include <libserialport.h>
+#include <stdint.h>
 
 using namespace cv;
 using namespace std;
