@@ -102,29 +102,126 @@ int main(int argsc, char *argsv[]){
 	    
     }else{
 
-      struct sp_port *port;
-      list_ports();
-      const char *desired_port = "/dev/ttyUSB0";
-      printf("Opening port '%s' \n", desired_port);
-	  sp_return error = sp_get_port_by_name(desired_port,&port);
-	  if (error == SP_OK) {
-	    error = sp_open(port,SP_MODE_WRITE);
-	    if (error == SP_OK) {
-	      int byte_num;
-	      sp_set_baudrate(port,250000);
-	 		uint8_t s[] = {0x20, 0x00, 0xff, 0xa2};
-	        byte_num = sp_nonblocking_write(port, s, 4);
-	        //parse_serial(byte_buff,byte_num);
-	        //fflush(stdout);
-	      
-
-	      sp_close(port);
-	    } else {
-	      printf("Error opening serial device\n");
+    	/* Port-related variables */
+		struct sp_port **port_list = NULL;
+		uint32_t n_ports = 0;
+		struct sp_port *local_list[10] = { NULL };
+		uint32_t local_index = 0;
+		struct sp_port *the_port = NULL;
+		 
+		/* Buffer-related variables */
+		uint32_t in_bytes = 0;
+		uint8_t in_buf[128] = { 0x00 };
+		uint32_t in_buf_bytes = 0;
+		uint32_t out_bytes = 0;
+		uint8_t out_buf[128] = "Hello World!";
+		uint32_t out_buf_bytes = 12;
+		 
+		uint32_t res = 0;
+		uint32_t ii = 0;
+		 
+	  /* 
+	   * List port, copying to a local list 
+	   */
+	  printf("1. List ports ...\n");
+	  if (sp_list_ports(&port_list) == SP_OK)
+	  {
+	    for(ii = 0; port_list[ii]; ii++)
+	    {
+	      printf("Found port '%s' .. ", sp_get_port_name(port_list[ii]));
+	      if (!(sp_copy_port(port_list[ii], &local_list[ii])))
+	      {
+	        printf("copied OK\n");
+	        n_ports++;
+	      }
+	      else
+	      {
+	        printf("copy FAILED !!\n");
+	        break;
+	      }
 	    }
-	  } else {
-	    printf("Error finding serial device\n");
 	  }
+	  else
+	  {
+	    printf("Port list FAILED !!\n");
+	    return 1;
+	  }
+	 
+	  /* Free the list */
+	  sp_free_port_list(port_list);
+	 
+	  /* 
+	   * Set a port to open
+	   */
+	  the_port = local_list[local_index];
+	 
+	  /* 
+	   * Open by list index instead name 
+	   */
+	  printf("2. Open port by index #%u ...\n", local_index);
+	  if (sp_open(the_port, PORT_CONF_FLAGS) == SP_OK)
+	  {
+	       sp_set_baudrate(the_port, PORT_CONF_BAUDRATE);
+	           sp_set_bits(the_port, PORT_CONF_BITS);
+	         sp_set_parity(the_port, PORT_CONF_PARITY);
+	       sp_set_stopbits(the_port, PORT_CONF_STOPBITS);
+	    sp_set_flowcontrol(the_port, PORT_CONF_FLOWCONTROL);
+	    printf(" + Port open and configure OK\n");
+	  }
+	  else
+	  {
+	    printf(" ! Port open FAILED\n");
+	  }
+	 
+	  /*
+	   * Write something to port
+	   */
+	  printf("3. Writing to port #%u ...\n - buffer data: ", local_index);
+	  for (ii = 0; ii < out_buf_bytes; ii++)
+	  {
+	    printf("%02X", out_buf[ii]);
+	  }
+	  printf("\n");
+	  out_bytes = sp_blocking_write(the_port, out_buf, out_buf_bytes, 1000);
+	  if (out_bytes != out_buf_bytes)
+	  {
+	    printf(" ! Port write FAILED\n");
+	    return 1;
+	  }
+	  printf(" + Port write OK\n");
+	 
+	  /*
+	   * Read something from port
+	   */
+	  printf("4. Read from port #%u ...\n", local_index);
+	  in_bytes = sp_blocking_read_next(the_port, in_buf, 128, 1000);
+	  if (in_bytes != out_buf_bytes)
+	  {
+	    printf(" ! Received %u bytes, expected %u. Read FAILED\n",
+	           in_bytes,
+	           out_buf_bytes);
+	    return 1;
+	  }
+	  printf(" - buffer data: ");
+	  for (ii = 0; ii < in_bytes; ii++)
+	  {
+	    printf("%02X", out_buf[ii]);
+	  }
+	  printf("\n");
+	  printf(" + Port read OK\n");
+	 
+	  /*
+	   * Close and free resources
+	   */
+	  printf("5. Closing and freeing resources #%u ...\n", local_index);
+	  if (sp_close(the_port) != SP_OK)
+	  {
+	    printf(" ! Port close FAILED\n");
+	    return 1;
+	  }
+	  printf(" + Port close OK\n");
+	  sp_free_port(the_port);
+  
 
 		// reading the image		
 		//image = imread(argsv[1], CV_LOAD_IMAGE_UNCHANGED);
