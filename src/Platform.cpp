@@ -33,51 +33,96 @@ int computeDistanceY(int pupilY, int cameraY){
 }
 
 // Function that moves the platform x axis left
-void moveXLeft(int distanceToMove){
-	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
+int moveXLeft(int distanceToMove, struct sp_port *port){
+	uint8_t command[4]; // the bytes 3 and 4 consists on the distance that the axis will be shifted
+	int numBytes = 0; 
 
+	// building the command
+	command[0] = XAXIS;
+	command[1] = LEFT;
 	printf("Moving x axis to left by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	thrdByte = (distanceToMove >> 8) & 0xFF;
-	fourthByte = distanceToMove & 0x000000FF;
-	printf("Command that will be passed = 0x%X%X%X%X\n", XAXIS, LEFT, thrdByte, fourthByte);
-}
+	command[2] = (distanceToMove >> 8) & 0xFF;
+	command[3] = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", XAXIS, LEFT, command[2], command[3]);
+
+	numBytes = sp_nonblocking_write(port, command, sizeof(command));
+	if(numBytes != sizeof(command)){
+		return ERROR;
+	}
+
+	return SUCCESS;
+} 
 
 // Function that moves the platform x axis right
-void moveXRight(int distanceToMove){
-	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
+int moveXRight(int distanceToMove, struct sp_port *port){
+	uint8_t command[4]; // the bytes 3 and 4 consists on the distance that the axis will be shifted
+	int numBytes = 0; 
 
+	// building the command
+	command[0] = XAXIS;
+	command[1] = RIGHT;
 	printf("Moving x axis to right by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	thrdByte = (distanceToMove >> 8) & 0xFF;
-	fourthByte = distanceToMove & 0x000000FF;
-	printf("Command that will be passed = 0x%X%X%X%X\n", XAXIS, RIGHT, thrdByte, fourthByte);
+	command[2] = (distanceToMove >> 8) & 0xFF;
+	command[3] = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", XAXIS, RIGHT, command[2], command[3]);
+
+	numBytes = sp_nonblocking_write(port, command, sizeof(command));
+	if(numBytes != sizeof(command)){
+		return ERROR;
+	}
+
+	return SUCCESS;
 }
 
 // Function that moves the platform y axis up
-void moveYUp(int distanceToMove){
-	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
-	
+int moveYUp(int distanceToMove, struct sp_port *port){
+	uint8_t command[4]; // the bytes 3 and 4 consists on the distance that the axis will be shifted
+	int numBytes = 0; 
+
+	// building the command
+	command[0] = YAXIS;
+	command[1] = RIGHT;
 	printf("Moving y axis up by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	thrdByte = (distanceToMove >> 8) & 0xFF;
-	fourthByte = distanceToMove & 0x000000FF;
-	printf("Command that will be passed = 0x%X%X%X%X\n", YAXIS, RIGHT, thrdByte, fourthByte);
+	command[2] = (distanceToMove >> 8) & 0xFF;
+	command[3] = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", YAXIS, RIGHT, command[2], command[3]);
+
+	numBytes = sp_nonblocking_write(port, command, sizeof(command));
+	if(numBytes != sizeof(command)){
+		return ERROR;
+	}
+
+	return SUCCESS;
 }
 
 // Function that moves the platform y axis down
-void moveYDown(int distanceToMove){
-	uint8_t thrdByte = 0, fourthByte = 0; // the bytes that consists on the distance that the axis will be shifted
-	
+int moveYDown(int distanceToMove, struct sp_port *port){
+	uint8_t command[4]; // the bytes 3 and 4 consists on the distance that the axis will be shifted
+	int numBytes = 0; 
+
+	// building the command
+	command[0] = YAXIS;
+	command[1] = LEFT;
 	printf("Moving y axis down by %d(0x%X) um\n", distanceToMove, distanceToMove);
-	thrdByte = (distanceToMove >> 8) & 0xFF;
-	fourthByte = distanceToMove & 0x000000FF;
-	printf("Command that will be passed = 0x%X%X%X%X\n", YAXIS, LEFT, thrdByte, fourthByte);
+	command[2] = (distanceToMove >> 8) & 0xFF;
+	command[3] = distanceToMove & 0x000000FF;
+	printf("Command that will be passed = 0x%X%X%X%X\n", YAXIS, LEFT, command[2], command[3]);
+
+	numBytes = sp_nonblocking_write(port, command, sizeof(command));
+	if(numBytes != sizeof(command)){
+		return ERROR;
+	}
+
+	return SUCCESS;
 }
 
-/* Function for implementing the platform moving logic
- It has as inputs the pupil center coordinates and
+/* Function for implementing the platform moving logic. It has as inputs the pupil center coordinates and
  the camera center coordinates */
-void controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY){
+int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *portName){
 	int distanceX = 0, distanceY = 0;
 	int umX = 0, umY = 0; // distances in micrometers of each axis
+	int successX = 0, successY = 0; // variables that will be used to check if the commands were sent correctly to the platform
+	struct sp_port *port; // structure for opening the port that will send the commands to the platform
 
 	// computing the distances for the x and y axis
 	distanceX = computeDistanceX(pupilX, cameraX);
@@ -87,29 +132,42 @@ void controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY){
 	umX = pixelToMicroMeters(distanceX);
 	umY = pixelToMicroMeters(distanceY);
 
-	cout << distanceX << ", " << distanceY << endl;
-	cout << umX << ", " << umY << endl;
+	// port necessary configurations
+	// finding the port device
+	sp_return getPort = sp_get_port_by_name(portName, &port);
+	if(getPort != SP_OK){
+		cout << "Failed to find the device with this port name!" << endl;
+		return ERROR;
+	}
+
+	// opening the port device
+	if(sp_open(port, SP_MODE_READ_WRITE) == SP_OK){
+	  	sp_set_baudrate(port, 250000); // default for the platform
+	}else{
+		cout << "Failed to open the port!" << endl;
+		return ERROR;
+	}  	
 
 	// MOVE UP
 	// camera center x coordinate is already on the same x coordinate that pupil center and camera y 
 	// coordinate is higher than pupil center y coordinate
 	if(distanceX == 0 && distanceY < 0){
 		umY = -umY;
-		moveYUp(umY);
+		successY = moveYUp(umY, port);
 	}
 
 	// MOVE DOWN
 	// camera center x coordinate is already on the same x coordinate that pupil center and camera y 
 	// coordinate is lesser than pupil center y coordinate
 	if(distanceX == 0 && distanceY > 0){
-		moveYDown(umY);
+		successY = moveYDown(umY, port);
 	}
 
 	// MOVE RIGHT
 	// camera center y coordinate is already on the same y coordinate that pupil center and camera x
 	// coordinate is lesser than pupil center x coordinate
 	if(distanceX > 0 && distanceY == 0){
-		moveXRight(umX);
+		successX = moveXRight(umX, port);
 	}
 
 	// MOVE LEFT
@@ -117,7 +175,7 @@ void controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY){
 	// coordinate is higher than pupil center x coordinate
 	if(distanceX < 0 && distanceY == 0){
 		umX = -umX;
-		moveXLeft(umX);
+		successX = moveXLeft(umX, port);
 	}
 
 	// MOVE UP RIGHT
@@ -125,8 +183,8 @@ void controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY){
 	// is higher than pupil y coordinate
 	if(distanceX > 0 && distanceY < 0){
 		umY = -umY;
-		moveYUp(umY);
-		moveXRight(umX);
+		successY = moveYUp(umY, port);
+		successX = moveXRight(umX, port);
 	}
 
 	// MOVE UP LEFT
@@ -135,16 +193,16 @@ void controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY){
 	if(distanceX < 0 && distanceY < 0){
 		umX = -umX;
 		umY = -umY;
-		moveYUp(umY);
-		moveXLeft(umX);
+		successY = moveYUp(umY, port);
+		successX = moveXLeft(umX, port);
 	}
 
 	// MOVE DOWN RIGHT
 	// camera center x coordinate is lesser than pupil center x coordinate and camera y coordinate
 	// is lesser than pupil y coordinate
 	if(distanceX > 0 && distanceY > 0){
-		moveYDown(umY);
-		moveXRight(umX);
+		successY = moveYDown(umY, port);
+		successX = moveXRight(umX, port);
 	}
 
 	// MOVE DOWN LEFT
@@ -152,8 +210,22 @@ void controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY){
 	// is lesser than pupil y coordinate
 	if(distanceX < 0 && distanceY > 0){
 		umX = -umX;
-		moveYDown(umY);
-		moveXLeft(umX);
+		successY = moveYDown(umY, port);
+		successX = moveXLeft(umX, port);
 	}
 
+	// port freeing and closing
+	if(sp_close(port) != SP_OK){
+		cout << "Failed to close the port!" << endl;
+	    return ERROR;
+	}
+	cout << "Port closed successfully!" << endl;
+	sp_free_port(port);
+
+	if(successX == ERROR || successY == ERROR){
+		cout << "Error while sending commands to the platform" << endl;
+		return ERROR;
+	}
+
+	return SUCCESS;
 }
