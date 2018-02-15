@@ -10,10 +10,25 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Dependencies, libraries, softwares and OS used in this project.
 
+Not necessary
 ```
-Give examples
+Ubuntu 16.04 (Not necessary)
+```
+
+Necessary
+```
+CMake - at least version 2.8
+```
+```
+OpenCV - version 3.3.0
+```
+```
+GCC - version 5.4.0
+```
+```
+libserialport - version 0.1.1
 ```
 
 ### Installing
@@ -22,19 +37,19 @@ A step by step series of examples that tell you have to get a development env ru
 
 Say what the step will be
 
-```
-Give the example
-```
-
-And repeat
+The CMake file is already done, its only necessary to follow the next steps for compiling the code
 
 ```
-until finished
+cd eyefinder
+```
+```
+cmake .
+```
+```
+make
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
+## Running the code
 
 Explain how to run the automated tests for this system
 
@@ -60,9 +75,9 @@ Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [OpenCV](https://opencv.org/) - Computer Vision library
+* [libserialport](https://sigrok.org/wiki/Libserialport) - Library used for serial port communication
+* [CMake](https://cmake.org/) - Used for building/compiling/linking C/C++ code
 
 ## Contributing
 
