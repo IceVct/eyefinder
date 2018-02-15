@@ -2,11 +2,11 @@
 
 Camera platform control for finding eye in a videosequence
 
-Projetct being developed in VUT (Brno University of Technology).
+Project being developed in STRaDe research group in the Faculty of Information Techonogy in VUT (Brno University of Technology).
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for running purposes
 
 ### Prerequisites
 
@@ -37,7 +37,7 @@ A step by step series of examples that tell you have to get a development env ru
 
 Say what the step will be
 
-The CMake file is already done, its only necessary to follow the next steps for compiling the code
+The CMake file is already done, it's only necessary to follow the next steps for compiling the code
 
 ```
 cd eyefinder
@@ -51,27 +51,27 @@ make
 
 ## Running the code
 
-Explain how to run the automated tests for this system
+The algorithm receives one argument, which is the port device (port_name) of the platform.
 
-### Break down into end to end tests
+For running the code, there are two methods.
 
-Explain what these tests test and why
+## First method
+```
+sudo ./eyefinder /dev/port_name
+```
+Usually, the port_name is /dev/ttyUSB0, but not necessarily.
+
+## Second method
+
+If you don't want to run as sudo, you must change the permission for the port device
 
 ```
-Give an example
+sudo chmod 666 /dev/port_name
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
-
 ```
-Give an example
+./eyefinder /dev/port_name
 ```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
 
 ## Built With
 
@@ -79,23 +79,11 @@ Add additional notes about how to deploy this on a live system
 * [libserialport](https://sigrok.org/wiki/Libserialport) - Library used for serial port communication
 * [CMake](https://cmake.org/) - Used for building/compiling/linking C/C++ code
 
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Victor Araujo Vieira** - [IceVct](https://github.com/IceVct)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
