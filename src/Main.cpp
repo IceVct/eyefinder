@@ -6,7 +6,7 @@ int main(int argsc, char *argsv[]){
 
 	double rmin, rmax;											// rmin and rmax are the minimum and maximum values of the iris radius 
 	Mat image;
-	bool webCam = false, camCenter = false;
+	bool webCam = true, camCenter = false;
 	int platformSucc = 0;
 
 	if(argsc < 3){
@@ -55,7 +55,7 @@ int main(int argsc, char *argsv[]){
 
 	        
 	        if(counter == 99){
-	        	thresh(frame, rmin, rmax, 0.2);
+	        	thresh(frame, rmin, rmax, 0.3);
 	        	printf("pupil (%d, %d)\n", cp[1], cp[0]);
 				platformSucc = controlPlatform(cp[1], cp[0], centerCameraX, centerCameraY, argsv[1]);
 				if(platformSucc == ERROR){
@@ -64,7 +64,7 @@ int main(int argsc, char *argsv[]){
 				drawMarker(frame, Point(cp[1], cp[0]), Scalar(0, 255, 0));
 				drawMarker(frame, Point(centerCameraX, centerCameraY), Scalar(0, 0, 255));
 				imshow("pupil", frame);
-				waitKey(0);
+				//waitKey(0);
 	        }             
 
 	        drawMarker(frame, Point(centerCameraX, centerCameraY), Scalar(0, 0, 255));
@@ -96,6 +96,7 @@ int main(int argsc, char *argsv[]){
 		}
 
 		drawMarker(image, Point(cp[1], cp[0]), Scalar(0, 255, 0));
+		drawMarker(image, Point(centerCameraX, centerCameraY), Scalar(0, 0, 255));
 		namedWindow( "OUTPUT IMAGE", CV_WINDOW_NORMAL );// Create a window for display.
 		imshow( "OUTPUT IMAGE", image);                   // Show our image inside it.
 	 	waitKey(0);  

@@ -15,7 +15,7 @@ struct sp_port *port;
 // so that can be passed as argument to the camera platform
 int pixelToMicroMeters(int pixelValue){
 	// 1 pixel is equal to 264,5833 um, so 265 is a rounded value
-	return 265*pixelValue;
+	return (int)264.58*pixelValue;
 }
 
 // Function that computes the distance from pupil center to camera center
