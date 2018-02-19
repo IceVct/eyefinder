@@ -6,7 +6,7 @@ int main(int argsc, char *argsv[]){
 
 	double rmin, rmax;											// rmin and rmax are the minimum and maximum values of the iris radius 
 	Mat image;
-	bool webCam = true, camCenter = false;
+	bool webCam = false;
 	int platformSucc = 0;
 
 	if(argsc < 3){

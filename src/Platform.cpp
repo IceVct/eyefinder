@@ -9,8 +9,6 @@ uint8_t LEFT = 0x40; // down for Y axis
 
 // Functions that implements the platform related functions
 
-struct sp_port *port;
-
 // Function that receives a value in pixels and convert it to um (micrometers)
 // so that can be passed as argument to the camera platform
 int pixelToMicroMeters(int pixelValue){
@@ -118,11 +116,14 @@ int moveYDown(int distanceToMove, struct sp_port *port){
 
 /* Function for implementing the platform moving logic. It has as inputs the pupil center coordinates and
  the camera center coordinates */
+// The function also write in a file the distance and direction that the platform moved, so that when the program is over
+// is only necessary to run another code that returns the platform to the original position
 int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *portName){
 	int distanceX = 0, distanceY = 0;
 	int umX = 0, umY = 0; // distances in micrometers of each axis
 	int successX = 0, successY = 0; // variables that will be used to check if the commands were sent correctly to the platform
 	struct sp_port *port; // structure for opening the port that will send the commands to the platform
+	FILE *fileDistances = NULL; // file descriptor
 
 	// computing the distances for the x and y axis
 	distanceX = computeDistanceX(pupilX, cameraX);
@@ -131,6 +132,13 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	//converting the distances to um so that can be passed as argument to the camera platform
 	umX = pixelToMicroMeters(distanceX);
 	umY = pixelToMicroMeters(distanceY);
+
+	// file for writing the distances and directions that the platform was moved
+	fileDistances = fopen("distanceAndDirection.txt", "w");
+	if(!fileDistances){
+		cout << "Unable to open the file!" << endl;
+		return ERROR;
+	}
 
 	// port necessary configurations
 	// finding the port device
@@ -154,6 +162,10 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	if(distanceX == 0 && distanceY < 0){
 		umY = -umY;
 		successY = moveYUp(umY, port);
+		
+		// if the platform goes up, then return to the original position
+		fprintf(fileDistances, "1\n");
+		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, LEFT, umY);
 	}
 
 	// MOVE DOWN
@@ -161,6 +173,10 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	// coordinate is lesser than pupil center y coordinate
 	if(distanceX == 0 && distanceY > 0){
 		successY = moveYDown(umY, port);
+		
+		// if the platform goes down, then return to the original position
+		fprintf(fileDistances, "1\n");
+		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, RIGHT, umY);
 	}
 
 	// MOVE RIGHT
@@ -168,6 +184,10 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	// coordinate is lesser than pupil center x coordinate
 	if(distanceX > 0 && distanceY == 0){
 		successX = moveXRight(umX, port);
+		
+		// if the platform goes right, then return to the original position
+		fprintf(fileDistances, "1\n");
+		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, LEFT, umX);
 	}
 
 	// MOVE LEFT
@@ -176,6 +196,10 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	if(distanceX < 0 && distanceY == 0){
 		umX = -umX;
 		successX = moveXLeft(umX, port);
+		
+		// if the platform goes left, then return to the original position
+		fprintf(fileDistances, "1\n");
+		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, RIGHT, umX);
 	}
 
 	// MOVE UP RIGHT
@@ -185,6 +209,11 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		umY = -umY;
 		successY = moveYUp(umY, port);
 		successX = moveXRight(umX, port);
+		
+		// if the platform goes up and right, then return to the original position
+		fprintf(fileDistances, "2\n");
+		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, LEFT, umX);
+		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, LEFT, umY);
 	}
 
 	// MOVE UP LEFT
@@ -195,6 +224,11 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		umY = -umY;
 		successY = moveYUp(umY, port);
 		successX = moveXLeft(umX, port);
+		
+		// if the platform goes up and left, then return to the original position
+		fprintf(fileDistances, "2\n");
+		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, RIGHT, umX);
+		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, LEFT, umY);
 	}
 
 	// MOVE DOWN RIGHT
@@ -203,6 +237,11 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	if(distanceX > 0 && distanceY > 0){
 		successY = moveYDown(umY, port);
 		successX = moveXRight(umX, port);
+		
+		// if the platform goes down and right, then return to the original position
+		fprintf(fileDistances, "2\n");
+		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, LEFT, umX);
+		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, RIGHT, umY);
 	}
 
 	// MOVE DOWN LEFT
@@ -212,7 +251,15 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		umX = -umX;
 		successY = moveYDown(umY, port);
 		successX = moveXLeft(umX, port);
+		
+		// if the platform goes down and left, then return to the original position
+		fprintf(fileDistances, "2\n");
+		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, RIGHT, umX);
+		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, RIGHT, umY);
 	}
+
+	//closing the file
+	fclose(fileDistances);
 
 	// port freeing and closing
 	if(sp_close(port) != SP_OK){
