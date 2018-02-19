@@ -89,10 +89,10 @@ sudo chmod 666 /dev/port_name
 * Algorithm to detect the pupil center was adapted from a translation of this https://www.mathworks.com/matlabcentral/fileexchange/15652-iris-segmentation-using-daugman-s-integrodifferential-operator?focused=3889799&tab=function matlab code to C++ using OpenCV
 
 
-### After running the eyefinder algorithm
+## After running the eyefinder algorithm
 For returning the platform for the initial position, one code was developed. Follow the steps bellow for compiling and running this code.
 
-## Compiling
+### Compiling
 In the main folder of the project "./eyefinder", run the following commands
 
 ```
@@ -103,7 +103,7 @@ cd MovePlatformBack
 gcc movePlatBack.c -lserialport -o movePlatBack
 ```
 
-## Running
+### Running
 For running this code, it is required one argument: the port device name
 
 ```
