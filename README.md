@@ -72,9 +72,25 @@ sudo chmod 666 /dev/port_name
 ```
 ./eyefinder /dev/port_name
 ```
+## Built With
+
+* [OpenCV](https://opencv.org/) - Computer Vision library
+* [libserialport](https://sigrok.org/wiki/Libserialport) - Library used for serial port communication
+* [CMake](https://cmake.org/) - Used for building/compiling/linking C/C++ code
+
+
+## Authors
+
+* **Victor Araujo Vieira** - [IceVct](https://github.com/IceVct)
+
+
+## Acknowledgments
+
+* Algorithm to detect the pupil center was adapted from a translation of this https://www.mathworks.com/matlabcentral/fileexchange/15652-iris-segmentation-using-daugman-s-integrodifferential-operator?focused=3889799&tab=function matlab code to C++ using OpenCV
+
 
 ### After running the eyefinder algorithm
-For returning the platform for the initial position, one algorithm was developed, follow the steps bellow for compiling and running this code.
+For returning the platform for the initial position, one code was developed. Follow the steps bellow for compiling and running this code.
 
 ## Compiling
 In the main folder of the project "./eyefinder", run the following commands
@@ -95,19 +111,4 @@ sudo ./movePlatBack /dev/port_name
 ```
 
 or changing the permissions, as explained above and running normally.
-## Built With
-
-* [OpenCV](https://opencv.org/) - Computer Vision library
-* [libserialport](https://sigrok.org/wiki/Libserialport) - Library used for serial port communication
-* [CMake](https://cmake.org/) - Used for building/compiling/linking C/C++ code
-
-
-## Authors
-
-* **Victor Araujo Vieira** - [IceVct](https://github.com/IceVct)
-
-
-## Acknowledgments
-
-* Algorithm to detect the pupil center was adapted from a translation of this https://www.mathworks.com/matlabcentral/fileexchange/15652-iris-segmentation-using-daugman-s-integrodifferential-operator?focused=3889799&tab=function matlab code to C++ using OpenCV
 
