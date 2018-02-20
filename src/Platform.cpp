@@ -165,7 +165,7 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes up, then return to the original position
 		fprintf(fileDistances, "1\n");
-		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, LEFT, umY);
+		fprintf(fileDistances, "%x %x %d\n", YAXIS, LEFT, umY);
 	}
 
 	// MOVE DOWN
@@ -176,7 +176,7 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes down, then return to the original position
 		fprintf(fileDistances, "1\n");
-		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, RIGHT, umY);
+		fprintf(fileDistances, "%x %x %d\n", YAXIS, RIGHT, umY);
 	}
 
 	// MOVE RIGHT
@@ -187,7 +187,7 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes right, then return to the original position
 		fprintf(fileDistances, "1\n");
-		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, LEFT, umX);
+		fprintf(fileDistances, "%x %x %d\n", XAXIS, LEFT, umX);
 	}
 
 	// MOVE LEFT
@@ -199,7 +199,7 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes left, then return to the original position
 		fprintf(fileDistances, "1\n");
-		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, RIGHT, umX);
+		fprintf(fileDistances, "%x %x %d\n", XAXIS, RIGHT, umX);
 	}
 
 	// MOVE UP RIGHT
@@ -212,8 +212,8 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes up and right, then return to the original position
 		fprintf(fileDistances, "2\n");
-		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, LEFT, umX);
-		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, LEFT, umY);
+		fprintf(fileDistances, "%x %x %d\n", XAXIS, LEFT, umX);
+		fprintf(fileDistances, "%x %x %d\n", YAXIS, LEFT, umY);
 	}
 
 	// MOVE UP LEFT
@@ -227,8 +227,8 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes up and left, then return to the original position
 		fprintf(fileDistances, "2\n");
-		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, RIGHT, umX);
-		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, LEFT, umY);
+		fprintf(fileDistances, "%x %x %d\n", XAXIS, RIGHT, umX);
+		fprintf(fileDistances, "%x %x %d\n", YAXIS, LEFT, umY);
 	}
 
 	// MOVE DOWN RIGHT
@@ -240,8 +240,8 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes down and right, then return to the original position
 		fprintf(fileDistances, "2\n");
-		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, LEFT, umX);
-		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, RIGHT, umY);
+		fprintf(fileDistances, "%x %x %d\n", XAXIS, LEFT, umX);
+		fprintf(fileDistances, "%x %x %d\n", YAXIS, RIGHT, umY);
 	}
 
 	// MOVE DOWN LEFT
@@ -254,8 +254,8 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 		
 		// if the platform goes down and left, then return to the original position
 		fprintf(fileDistances, "2\n");
-		fprintf(fileDistances, "%x %x %x %x\n", XAXIS, RIGHT, umX);
-		fprintf(fileDistances, "%x %x %x %x\n", YAXIS, RIGHT, umY);
+		fprintf(fileDistances, "%x %x %d\n", XAXIS, RIGHT, umX);
+		fprintf(fileDistances, "%x %x %d\n", YAXIS, RIGHT, umY);
 	}
 
 	//closing the file

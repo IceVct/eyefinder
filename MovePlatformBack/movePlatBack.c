@@ -47,10 +47,16 @@ int main(int argsc, char *argsv[]){
 	fscanf(fileDistances, "%d\n", &amountCommands);
 	if(amountCommands == 1){
 		fscanf(fileDistances, "%hhx %hhx %d\n", &platCommands[0], &platCommands[1], &distanceToMove1);
+
+		// the maximum distance for each direction of axis x is 3,75 cm and for axis z is 1,25 cm, so if 
+		// the distance to move is higher than that distance to move must be changed to 37500 or 12500
+		if(platCommands[0] == 0x12 && distanceToMove1 > 37500) distanceToMove1 = 37500;
+		if(platCommands[0] == 0x22 && distanceToMove1 > 37500) distanceToMove1 = 37500; // TODO: CHANGE FOR THE Z LOGIC
+
 		platCommands[2] = (distanceToMove1 >> 8) & 0xFF;
 		platCommands[3] = distanceToMove1 & 0x000000FF;
 
-		//printf("%x %x %x %x\n", platCommands[0], platCommands[1], platCommands[2], platCommands[3]);
+		printf("Command %x %x %x %x\n", platCommands[0], platCommands[1], platCommands[2], platCommands[3]);
 
 		//send the write command to the port
 		numBytes = sp_nonblocking_write(port, platCommands, sizeof(platCommands));
@@ -61,13 +67,19 @@ int main(int argsc, char *argsv[]){
 	}else{
 		fscanf(fileDistances, "%hhx %hhx %d\n", &platCommX[0], &platCommX[1], &distanceToMove1);
 		fscanf(fileDistances, "%hhx %hhx %d\n", &platCommY[0], &platCommY[1], &distanceToMove2);
+
+		// the maximum distance for each direction of axis x is 3,75 cm and for axis z is 1,25 cm, so if 
+		// the distance to move is higher than that distance to move must be changed to 37500 or 12500
+		if(distanceToMove1 > 37500) distanceToMove1 = 37500;
+		if(distanceToMove2 > 37500) distanceToMove2 = 37500; // TODO: CHANGE FOR THE Z LOGIC
+
 		platCommX[2] = (distanceToMove1 >> 8) & 0xFF;
 		platCommX[3] = distanceToMove1 & 0x000000FF;
 		platCommY[2] = (distanceToMove2 >> 8) & 0xFF;
 		platCommY[3] = distanceToMove2 & 0x000000FF;
 
-		// printf("X %x %x %x %x\n", platCommX[0], platCommX[1], platCommX[2], platCommX[3]);
-		// printf("Y %x %x %x %x\n", platCommY[0], platCommY[1], platCommY[2], platCommY[3]);
+		printf("Command X %x %x %x %x\n", platCommX[0], platCommX[1], platCommX[2], platCommX[3]);
+		printf("Command Y %x %x %x %x\n", platCommY[0], platCommY[1], platCommY[2], platCommY[3]);
 		// send the write command to the port
 		numBytes = sp_nonblocking_write(port, platCommX, sizeof(platCommX));
 		numBytes2 = sp_nonblocking_write(port, platCommY, sizeof(platCommY));
