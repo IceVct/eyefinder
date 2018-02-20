@@ -104,11 +104,12 @@ gcc movePlatBack.c -lserialport -o movePlatBack
 ```
 
 ### Running
-For running this code, it is required one argument: the port device name
+This code requires one argument: the port device name.
+For running this code, run the following command
 
 ```
 sudo ./movePlatBack /dev/port_name
 ```
 
-or changing the permissions, as explained above and running normally.
+or change the permissions, as explained above and run it normally.
 
