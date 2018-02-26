@@ -133,6 +133,8 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	umX = pixelToMicroMeters(distanceX);
 	umY = pixelToMicroMeters(distanceY);
 
+	umY = umY*2.5; // UNTIL THE Z AXIS MOTOR IS NOT CALIBRATED
+
 	// file for writing the distances and directions that the platform was moved
 	fileDistances = fopen("distanceAndDirection.txt", "w");
 	if(!fileDistances){
