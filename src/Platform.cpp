@@ -79,7 +79,7 @@ int moveYUp(int distanceToMove, struct sp_port *port){
 
 	// building the command
 	command[0] = YAXIS;
-	command[1] = RIGHT;
+	command[1] = LEFT;
 	printf("Moving y axis up by %d(0x%X) um\n", distanceToMove, distanceToMove);
 	command[2] = (distanceToMove >> 8) & 0xFF;
 	command[3] = distanceToMove & 0x000000FF;
@@ -100,7 +100,7 @@ int moveYDown(int distanceToMove, struct sp_port *port){
 
 	// building the command
 	command[0] = YAXIS;
-	command[1] = LEFT;
+	command[1] = RIGHT;
 	printf("Moving y axis down by %d(0x%X) um\n", distanceToMove, distanceToMove);
 	command[2] = (distanceToMove >> 8) & 0xFF;
 	command[3] = distanceToMove & 0x000000FF;
@@ -133,7 +133,7 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	umX = pixelToMicroMeters(distanceX);
 	umY = pixelToMicroMeters(distanceY);
 
-	umY = umY*2.5; // UNTIL THE Z AXIS MOTOR IS NOT CALIBRATED
+	umY = umY/2.5; // UNTIL THE Z AXIS MOTOR IS NOT CALIBRATED
 
 	// file for writing the distances and directions that the platform was moved
 	fileDistances = fopen("distanceAndDirection.txt", "w");

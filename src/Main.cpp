@@ -9,8 +9,8 @@ int main(int argsc, char *argsv[]){
 	bool webCam = true;
 	int platformSucc = 0;
 
-	if(argsc < 3){
-		cout << "At least three arguments must be passed!" << endl;
+	if(argsc < 2){
+		cout << "At least two arguments must be passed!" << endl;
 		exit(1);
 	}
 	
