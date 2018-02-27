@@ -51,7 +51,7 @@ int main(int argsc, char *argsv[]){
 		// the maximum distance for each direction of axis x is 3,75 cm and for axis z is 1,25 cm, so if 
 		// the distance to move is higher than that distance to move must be changed to 37500 or 12500
 		if(platCommands[0] == 0x12 && distanceToMove1 > 37500) distanceToMove1 = 37500;
-		if(platCommands[0] == 0x22 && distanceToMove1 > 12500) distanceToMove1 = 12500; // TODO: CHANGE FOR THE Z LOGIC
+		if(platCommands[0] == 0x22 && distanceToMove1 > 12500) distanceToMove1 = 12500; 
 
 		platCommands[2] = (distanceToMove1 >> 8) & 0xFF;
 		platCommands[3] = distanceToMove1 & 0x000000FF;
@@ -71,7 +71,7 @@ int main(int argsc, char *argsv[]){
 		// the maximum distance for each direction of axis x is 3,75 cm and for axis z is 1,25 cm, so if 
 		// the distance to move is higher than that distance to move must be changed to 37500 or 12500
 		if(distanceToMove1 > 37500) distanceToMove1 = 37500;
-		if(distanceToMove2 > 12500) distanceToMove2 = 12500; // TODO: CHANGE FOR THE Z LOGIC
+		if(distanceToMove2 > 12500) distanceToMove2 = 12500; 
 
 		platCommX[2] = (distanceToMove1 >> 8) & 0xFF;
 		platCommX[3] = distanceToMove1 & 0x000000FF;

@@ -28,7 +28,7 @@ int main(int argsc, char *argsv[]){
 
 	// properties for the camera frame capture
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, 400);
-	capture.set(CV_CAP_PROP_FRAME_HEIGHT, 400);
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT, 300);
 
     if (!capture.isOpened()){ 
     	cout << "--(!)Error opening video capture\n" << endl;

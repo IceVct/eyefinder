@@ -20,7 +20,8 @@
 using namespace cv;
 using namespace std;
 
-int pixelToMicroMeters(int pixelValue);
+int pixelToMicroMetersX(int pixelValueX);
+int pixelToMicroMetersY(int pixelValueY);
 int computeDistanceX(int pupilX, int cameraX);
 int computeDistanceY(int pupilY, int cameraY);
 int moveXLeft(int distanceToMove, struct sp_port *port);

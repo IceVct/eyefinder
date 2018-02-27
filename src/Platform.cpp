@@ -9,11 +9,20 @@ uint8_t LEFT = 0x40; // down for Y axis
 
 // Functions that implements the platform related functions
 
-// Function that receives a value in pixels and convert it to um (micrometers)
+// Function that receives a value in pixels from the x axis and convert it to um (micrometers)
 // so that can be passed as argument to the camera platform
-int pixelToMicroMeters(int pixelValue){
-	// 1 pixel is equal to 264,5833 um, so 265 is a rounded value
-	return (int)264.58*pixelValue;
+int pixelToMicroMetersX(int pixelValueX){
+
+	// the convertion varies depending on the distance of the camera to the face
+	return 110*pixelValueX;
+}
+
+// Function that receives a value in pixels from the y axis and convert it to um (micrometers)
+// so that can be passed as argument to the camera platform
+int pixelToMicroMetersY(int pixelValueY){
+
+	// the convertion varies depending on the distance of the camera to the face
+	return 95*pixelValueY;
 }
 
 // Function that computes the distance from pupil center to camera center
@@ -79,7 +88,7 @@ int moveYUp(int distanceToMove, struct sp_port *port){
 
 	// building the command
 	command[0] = YAXIS;
-	command[1] = LEFT;
+	command[1] = RIGHT;
 	printf("Moving y axis up by %d(0x%X) um\n", distanceToMove, distanceToMove);
 	command[2] = (distanceToMove >> 8) & 0xFF;
 	command[3] = distanceToMove & 0x000000FF;
@@ -100,7 +109,7 @@ int moveYDown(int distanceToMove, struct sp_port *port){
 
 	// building the command
 	command[0] = YAXIS;
-	command[1] = RIGHT;
+	command[1] = LEFT;
 	printf("Moving y axis down by %d(0x%X) um\n", distanceToMove, distanceToMove);
 	command[2] = (distanceToMove >> 8) & 0xFF;
 	command[3] = distanceToMove & 0x000000FF;
@@ -130,10 +139,8 @@ int controlPlatform(int pupilX, int pupilY, int cameraX, int cameraY, char *port
 	distanceY = computeDistanceY(pupilY, cameraY);
 
 	//converting the distances to um so that can be passed as argument to the camera platform
-	umX = pixelToMicroMeters(distanceX);
-	umY = pixelToMicroMeters(distanceY);
-
-	umY = umY/2.5; // UNTIL THE Z AXIS MOTOR IS NOT CALIBRATED
+	umX = pixelToMicroMetersX(distanceX);
+	umY = pixelToMicroMetersY(distanceY);
 
 	// file for writing the distances and directions that the platform was moved
 	fileDistances = fopen("distanceAndDirection.txt", "w");
